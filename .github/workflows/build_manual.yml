@@ -28,8 +28,9 @@ on:
         - 'warning'
         - 'error'
       latest-builder:
-        description: 'update the esp32-arduino-lib-builder when building'
-        default: 'true' 
+        description: 'Update esp32-arduino-lib-builder'
+        type: boolean
+        default: true 
 
 jobs:
   run:
