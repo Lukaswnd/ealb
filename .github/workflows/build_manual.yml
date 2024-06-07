@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Apply Changes
         shell: bash
@@ -54,7 +54,6 @@ jobs:
       - name: Build
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
           export TARGET_TYPE=${{ github.event.inputs.target }}
@@ -65,11 +64,12 @@ jobs:
           cd ..
           
       - name: Release
-        uses: jason2866/action-gh-release@v1.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: "ELAB-3.0.x-${{ github.run_number }}"
+          name: "Release ${{ github.run_number }} 3.0.x "
+          tag_name: "r3.0.0.${{ github.run_number }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: lukaswnd/elab
           files: |
             ./dist/*
          
