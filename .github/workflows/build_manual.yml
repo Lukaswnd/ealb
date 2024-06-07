@@ -69,7 +69,6 @@ jobs:
           name: "Release ${{ github.run_number }} 3.0.x "
           tag_name: "3.0.x.${{ github.run_number }}"
           token: ${{ secrets.GITHUB_TOKEN }}
-          repository: lukaswnd/elab
           files: |
             ./dist/*
          
