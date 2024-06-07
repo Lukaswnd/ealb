@@ -61,6 +61,7 @@ jobs:
           echo "Building for $TARGET_TYPE (log_level: $LOG_LEVEL)"
           cd original
           bash ./build.sh -e -d -t $TARGET_TYPE -D $LOG_LEVEL
+          cd ..
           
       - name: Release
         uses: jason2866/action-gh-release@v1.2
@@ -69,5 +70,5 @@ jobs:
         with:
           tag_name: "3.0.0.${{ github.run_number }}"
           files: |
-            ./original/dist/framework*
+            ./framework*
          
