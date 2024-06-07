@@ -133,15 +133,9 @@
 			"features":[],
 			"idf_libs":["qio","80m","opi_ram"],
 			"bootloaders":[
-				["qio","120m","qio_ram"],
-				["qio","120m","opi_ram"],
-				["qio","80m","qio_ram"],
 				["qio","80m","opi_ram"]
 			],
 			"mem_variants":[
-				["qio","120m","qio_ram"],
-				["qio","120m","opi_ram"],
-				["qio","80m","qio_ram"],
 				["qio","80m","opi_ram"]
 			]
 		}
