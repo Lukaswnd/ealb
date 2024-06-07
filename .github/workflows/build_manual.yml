@@ -70,5 +70,5 @@ jobs:
         with:
           tag_name: "3.0.0.${{ github.run_number }}"
           files: |
-            ./framework*
+            ./dist/*
          

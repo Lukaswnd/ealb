@@ -41,5 +41,6 @@ cp -rf arduino-esp32/ framework-arduinoespressif32/
 
 # If the framework is needed as tar.gz uncomment next line
 # tar --exclude=.* -zcf ../$pio_archive_path framework-arduinoespressif32/
-7z a -mx=9 -tzip -xr'!.*' ../../../$pio_zip_archive_path framework-arduinoespressif32/
-7z a -mx=9 -tzip -xr'!.*' ../../../$pio_zip_archive_libs_path framework-arduinoespressif32-libs/
+mkdir ../../../dist
+7z a -mx=9 -tzip -xr'!.*' ../../../dist/$pio_zip_archive_path framework-arduinoespressif32/
+7z a -mx=9 -tzip -xr'!.*' ../../../dist/$pio_zip_archive_libs_path framework-arduinoespressif32-libs/
