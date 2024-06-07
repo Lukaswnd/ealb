@@ -60,7 +60,7 @@ jobs:
           export LOG_LEVEL=${{ github.event.inputs.log_level }}
           echo "Building for $TARGET_TYPE (log_level: $LOG_LEVEL)"
           cd original
-          bash ./build.sh -e -d -t $TARGET_TYPE -D $LOG_LEVEL
+          bash ./build.sh -e -t $TARGET_TYPE -D $LOG_LEVEL
           cd ..
           
       - name: Release
