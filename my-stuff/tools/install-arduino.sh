@@ -56,6 +56,8 @@ rm -rf "$AR_COMPS/arduino/docs" \
        "$AR_COMPS/arduino/libraries/RainMaker" \
        "$AR_COMPS/arduino/libraries/Insights" \
        "$AR_COMPS/arduino/libraries/SPIFFS" \
+	   "$AR_COMPS/arduino//libraries/PPP" \
+	   "$AR_COMPS/arduino//libraries/WiFiProv" \
        "$AR_COMPS/arduino/libraries/ESP_SR" \
        "$AR_COMPS/arduino/libraries/TFLiteMicro"
 
