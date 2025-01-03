@@ -5,7 +5,7 @@ IDF_BRANCH=$(git -C "$IDF_PATH" symbolic-ref --short HEAD || git -C "$IDF_PATH" 
 idf_version_string=${IDF_BRANCH//\//_}"-$IDF_COMMIT"
 
 archive_path="dist/arduino-esp32-libs-$1-$idf_version_string.tar.gz"
-$AR_SDK_zip_archive_path="/fae32.zip"
+$pio_zip_archive_path="/fae32.zip"
 pio_zip_archive_libs_path="/fae32-libs.zip"
 pio_zip_archive_short="/build.zip"
 
@@ -47,27 +47,27 @@ cp -rf tools/esp32-arduino-libs fae32-libs/
 cp -rf arduino-esp32/ fae32/
 
 
-#cp -rf tools/esp32-arduino-libs arduino-esp32/tools/
+cp -rf tools/esp32-arduino-libs arduino-esp32/tools/
 # Use sed to replace the line
-#sed -i '/^FRAMEWORK_LIBS_DIR = /c\FRAMEWORK_LIBS_DIR = join(FRAMEWORK_DIR, "tools", "esp32-arduino-libs")' "arduino-esp32/tools/pioarduino-build.py"
+sed -i '/^FRAMEWORK_LIBS_DIR = /c\FRAMEWORK_LIBS_DIR = join(FRAMEWORK_DIR, "tools", "esp32-arduino-libs")' "arduino-esp32/tools/pioarduino-build.py"
 # Check if the sed command was successful
-#if [ $? -eq 0 ]; then
-#  echo "File updated successfully."
-#else
-#  echo "Failed to update the file."
-#fi
-#find "arduino-esp32/tools/esp32-arduino-libs" -type f -name "pioarduino-build.py" | while read -r FILE_PATH; do
-#  # Use sed to replace the line
-#  sed -i -e '/^FRAMEWORK_SDK_DIR = env.PioPlatform().get_package_dir(/,/^)/c\FRAMEWORK_SDK_DIR = join(FRAMEWORK_DIR, "tools", "esp32-arduino-libs")' "$FILE_PATH"
-#
-#  # Check if the sed command was successful
-#  if [ $? -eq 0 ]; then
-#    echo "File $FILE_PATH updated successfully."
-#  else
-#    echo "Failed to update the file $FILE_PATH."
-#    exit 1
-#  fi
-#done
+if [ $? -eq 0 ]; then
+  echo "File updated successfully."
+else
+  echo "Failed to update the file."
+fi
+find "arduino-esp32/tools/esp32-arduino-libs" -type f -name "pioarduino-build.py" | while read -r FILE_PATH; do
+  # Use sed to replace the line
+  sed -i -e '/^FRAMEWORK_SDK_DIR = env.PioPlatform().get_package_dir(/,/^)/c\FRAMEWORK_SDK_DIR = join(FRAMEWORK_DIR, "tools", "esp32-arduino-libs")' "$FILE_PATH"
+
+  # Check if the sed command was successful
+  if [ $? -eq 0 ]; then
+    echo "File $FILE_PATH updated successfully."
+  else
+    echo "Failed to update the file $FILE_PATH."
+    exit 1
+  fi
+done
 
 cp -rf arduino-esp32/ fae32-build/
 
