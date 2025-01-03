@@ -5,8 +5,9 @@ IDF_BRANCH=$(git -C "$IDF_PATH" symbolic-ref --short HEAD || git -C "$IDF_PATH" 
 idf_version_string=${IDF_BRANCH//\//_}"-$IDF_COMMIT"
 
 archive_path="dist/arduino-esp32-libs-$1-$idf_version_string.tar.gz"
-$pio_zip_archive_path="/fae32.zip"
-pio_zip_archive_libs_path="/fae32-libs.zip"
+$pio_zip_archive_path="/main.zip"
+$pio_zip_archive_path2="/fae_32.zip"
+pio_zip_archive_libs_path="/libs.zip"
 pio_zip_archive_short="/build.zip"
 
 mkdir -p dist && rm -rf "$archive_path"
@@ -41,6 +42,7 @@ rm -rf arduino-esp32/tools/gen_insights_package.py
 
 cp ../package.json arduino-esp32/package.json
 cp ../core_version.h arduino-esp32/cores/esp32/core_version.h
+cp -rf arduino-esp32/ fae_32/
 cp -rf tools/esp32-arduino-libs fae32-libs/
 cp -rf arduino-esp32/ fae32/
 
@@ -73,5 +75,6 @@ cp -rf arduino-esp32/ fae32-build/
 # tar --exclude=.* -zcf ../$pio_archive_path framework-arduinoespressif32/
 mkdir -p ../../dist
 7z a -mx=9 -tzip -xr'!.*' ../../dist/$pio_zip_archive_path fae32/
+7z a -mx=9 -tzip -xr'!.*' ../../dist/$pio_zip_archive_path2 fae_32/
 7z a -mx=9 -tzip -xr'!.*' ../../dist/$pio_zip_archive_libs_path fae32-libs/
 7z a -mx=9 -tzip -xr'!.*' ../../dist/$pio_zip_archive_short fae32-build/
