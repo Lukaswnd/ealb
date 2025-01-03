@@ -6,7 +6,7 @@ import sys
 
 MANIFEST_DATA = {
     "name": "framework-arduinoespressif32-libs",
-    "description": "Precompiled platformio framework for Arduino for the Espressif ESP32 series of SoCs",
+    "description": "Precompiled pioarduino framework for Arduino for the Espressif ESP32 series of SoCs",
     "keywords": ["framework", "arduino", "espressif", "esp32"],
     "license": "LGPL-2.1-or-later",
     "repository": {
@@ -55,7 +55,7 @@ def main(dst_dir, version_string, commit_hash, build_number):
         json.dump(MANIFEST_DATA, fp, indent=2)
 
     print(
-        f"Generated PlatformIO manifest file '{manifest_file_path}' with '{converted_version}' version"
+        f"Generated pioarduino manifest file '{manifest_file_path}' with '{converted_version}' version"
     )
     return 0
 

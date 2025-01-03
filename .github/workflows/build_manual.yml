@@ -16,6 +16,7 @@ on:
         - 'esp32c3'
         - 'esp32c6'
         - 'esp32h2'
+        - 'esp32p4'
       log_level:
         type: choice
         description: Choose Log Level
