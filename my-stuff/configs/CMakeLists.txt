@@ -98,7 +98,6 @@ set(ARDUINO_ALL_LIBRARIES
   NetBIOS
   Network
   OpenThread
-  PPP
   Preferences
   SD_MMC
   SD
@@ -172,9 +171,6 @@ set(ARDUINO_LIBRARY_Matter_SRCS
   libraries/Matter/src/MatterEndpoints/MatterOnOffPlugin.cpp
   libraries/Matter/src/Matter.cpp)
 
-set(ARDUINO_LIBRARY_PPP_SRCS
-  libraries/PPP/src/PPP.cpp
-  libraries/PPP/src/ppp.c)
 
 set(ARDUINO_LIBRARY_Preferences_SRCS libraries/Preferences/src/Preferences.cpp)
 
