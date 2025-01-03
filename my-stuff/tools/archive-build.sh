@@ -43,7 +43,7 @@ cp "$TOOLS_JSON_OUT/package.json" tools/esp32-arduino-libs/package.json
 cp "$AR_ROOT/package.json" arduino-esp32/package.json
 cp ../core_version.h arduino-esp32/cores/esp32/core_version.h
 #cp -rf arduino-esp32/ main/
-#cp -rf tools/esp32-arduino-libs libs/
+cp -rf tools/esp32-arduino-libs libs/
 #cp -rf arduino-esp32/ fae32/
 
 
