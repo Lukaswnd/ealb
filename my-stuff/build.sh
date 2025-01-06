@@ -306,15 +306,13 @@ if [ "$BUILD_TYPE" = "all" ]; then
 fi
 
 # Generate pioarduino manifest file
-if [ "$BUILD_TYPE" = "all" ]; then
-    echo "* Generating pioarduino manifest file..."
-    pushd $IDF_PATH
-    ibr=$(git describe --all 2>/dev/null)
-    ic=$(git -C "$IDF_PATH" rev-parse --short HEAD)
-    popd
-    python3 ./tools/gen_pioarduino_manifest-libs.py -o "$TOOLS_JSON_OUT/" -s "$ibr" -c "$ic" -n "$GITHUB_RUN_NUMBER"
-    if [ $? -ne 0 ]; then exit 1; fi
-fi
+echo "* Generating pioarduino libs manifest file..."
+pushd $IDF_PATH
+ibr=$(git describe --all 2>/dev/null)
+ic=$(git -C "$IDF_PATH" rev-parse --short HEAD)
+popd
+python3 ./tools/gen_pioarduino_manifest-libs.py -o "$TOOLS_JSON_OUT/" -s "$ibr" -c "$ic" -n "$GITHUB_RUN_NUMBER"
+if [ $? -ne 0 ]; then exit 1; fi
 
 
 
@@ -324,10 +322,9 @@ AR_VERSION_UNDERSCORE=`echo "$AR_VERSION" | tr . _`
 
 # Generate pioarduino framework manifest file
 rm -rf "$AR_ROOT/package.json"
-if [ "$BUILD_TYPE" = "all" ]; then
-    python3 ./tools/gen_pioarduino_manifest.py -o "$AR_ROOT/" -s "v$AR_VERSION" -c "$IDF_COMMIT" -n "$GITHUB_RUN_NUMBER"
-    if [ $? -ne 0 ]; then exit 1; fi
-fi
+echo "* Generating pioarduino manifest file..."
+python3 ./tools/gen_pioarduino_manifest.py -o "$AR_ROOT/" -s "v$AR_VERSION" -c "$IDF_COMMIT" -n "$GITHUB_RUN_NUMBER"
+if [ $? -ne 0 ]; then exit 1; fi
 
 # Generate core_version.h
 rm -rf "$AR_ROOT/core_version.h"

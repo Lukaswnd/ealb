@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ./tools/config.sh
+
 IDF_COMMIT=$(git -C "$IDF_PATH" rev-parse --short HEAD || echo "")
 IDF_BRANCH=$(git -C "$IDF_PATH" symbolic-ref --short HEAD || git -C "$IDF_PATH" tag --points-at HEAD || echo "")
 idf_version_string=${IDF_BRANCH//\//_}"-$IDF_COMMIT"
@@ -38,7 +40,7 @@ rm -rf arduino-esp32/libraries/TFLiteMicro
 rm -rf arduino-esp32/libraries/ESP_SR
 rm -rf arduino-esp32/tools/esp32-arduino-libs
 rm -rf arduino-esp32/tools/gen_insights_package.py
-rm -rf arduino-esp32/package.json
+#rm -rf arduino-esp32/package.json
 
 cp "$TOOLS_JSON_OUT/package.json" tools/esp32-arduino-libs/package.json
 cp "$AR_ROOT/package.json" arduino-esp32/package.json
