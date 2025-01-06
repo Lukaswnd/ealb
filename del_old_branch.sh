@@ -1,1 +1,1 @@
-git branch -D release/hp/3.0.x
+git branch -D release/hp/3.1.x
