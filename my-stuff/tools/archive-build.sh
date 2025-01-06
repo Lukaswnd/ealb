@@ -38,6 +38,7 @@ rm -rf arduino-esp32/libraries/TFLiteMicro
 rm -rf arduino-esp32/libraries/ESP_SR
 rm -rf arduino-esp32/tools/esp32-arduino-libs
 rm -rf arduino-esp32/tools/gen_insights_package.py
+rm -rf arduino-esp32/package.json
 
 cp "$TOOLS_JSON_OUT/package.json" tools/esp32-arduino-libs/package.json
 cp "$AR_ROOT/package.json" arduino-esp32/package.json

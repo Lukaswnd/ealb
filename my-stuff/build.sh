@@ -312,7 +312,7 @@ if [ "$BUILD_TYPE" = "all" ]; then
     ibr=$(git describe --all 2>/dev/null)
     ic=$(git -C "$IDF_PATH" rev-parse --short HEAD)
     popd
-    python3 ./tools/gen_pioarduino_manifest.py -o "$TOOLS_JSON_OUT/" -s "$ibr" -c "$ic" -n "$GITHUB_RUN_NUMBER"
+    python3 ./tools/gen_pioarduino_manifest-libs.py -o "$TOOLS_JSON_OUT/" -s "$ibr" -c "$ic" -n "$GITHUB_RUN_NUMBER"
     if [ $? -ne 0 ]; then exit 1; fi
 fi
 
@@ -325,7 +325,7 @@ AR_VERSION_UNDERSCORE=`echo "$AR_VERSION" | tr . _`
 # Generate pioarduino framework manifest file
 rm -rf "$AR_ROOT/package.json"
 if [ "$BUILD_TYPE" = "all" ]; then
-    python3 ./tools/gen_pio_frmwk_manifest.py -o "$AR_ROOT/" -s "v$AR_VERSION" -c "$IDF_COMMIT" -n "$GITHUB_RUN_NUMBER"
+    python3 ./tools/gen_pioarduino_manifest.py -o "$AR_ROOT/" -s "v$AR_VERSION" -c "$IDF_COMMIT" -n "$GITHUB_RUN_NUMBER"
     if [ $? -ne 0 ]; then exit 1; fi
 fi
 
