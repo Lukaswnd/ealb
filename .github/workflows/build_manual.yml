@@ -70,8 +70,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Release ${{ github.run_number }} 3.1.x ${{ github.event.inputs.target }} (log_level: ${{ github.event.inputs.log_level }})"
-          tag_name: "3.1.x.${{ github.run_number }}"
+          name: "Release ${{ github.run_number }} 3.2.x ${{ github.event.inputs.target }} (log_level: ${{ github.event.inputs.log_level }})"
+          tag_name: "3.2.x.${{ github.run_number }}"
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             ./dist/*
