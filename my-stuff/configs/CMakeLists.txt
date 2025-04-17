@@ -103,6 +103,7 @@ set(ARDUINO_ALL_LIBRARIES
   SD_MMC
   SD
   SimpleBLE
+  SPIFFS
   SPI
   Ticker
   Update
@@ -271,7 +272,6 @@ set(ARDUINO_LIBRARY_Zigbee_SRCS
   libraries/Zigbee/src/ep/ZigbeeGateway.cpp
   libraries/Zigbee/src/ep/ZigbeeWindSpeedSensor.cpp
   libraries/Zigbee/src/ep/ZigbeeIlluminanceSensor.cpp
-  libraries/Zigbee/src/ep/ZigbeePM25Sensor.cpp
   )
 
 set(ARDUINO_LIBRARY_BLE_SRCS
