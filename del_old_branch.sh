@@ -1,0 +1,1 @@
+git branch -D release/hp/3.2.x

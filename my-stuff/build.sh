@@ -1,14 +1,24 @@
 #!/bin/bash
 
 if ! [ -x "$(command -v python3)" ]; then
-    echo "ERROR: python is not installed! Please install python first."
+    echo "ERROR: python is not installed or not in PATH! Please install python first."
     exit 1
 fi
 
 if ! [ -x "$(command -v git)" ]; then
-    echo "ERROR: git is not installed! Please install git first."
+    echo "ERROR: git is not installed or not in PATH! Please install git first."
     exit 1
 fi
+
+if ! [ -x "$(command -v ninja)" ]; then
+    echo "ERROR: ninja is not installed or not in PATH! Please install ninja first."
+    exit 1
+fi
+
+# Fixes building some components. See https://github.com/espressif/arduino-esp32/issues/10167
+export IDF_COMPONENT_OVERWRITE_MANAGED_COMPONENTS=1
+
+CCACHE_ENABLE=1
 
 TARGET="all"
 BUILD_TYPE="all"
@@ -21,8 +31,9 @@ if [ -z $DEPLOY_OUT ]; then
 fi
 
 function print_help() {
-    echo "Usage: build.sh [-s] [-A <arduino_branch>] [-I <idf_branch>] [-D <debug_level>] [-i <idf_commit>] [-c <path>] [-t <target>] [-b <build|menuconfig|reconfigure|idf-libs|copy-bootloader|mem-variant>] [config ...]"
+    echo "Usage: build.sh [-s] [-n] [-A <arduino_branch>] [-I <idf_branch>] [-D <debug_level>] [-i <idf_commit>] [-c <path>] [-t <target>] [-b <build|menuconfig|reconfigure|idf-libs|copy-bootloader|mem-variant>] [config ...]"
     echo "       -s     Skip installing/updating of ESP-IDF and all components"
+    echo "       -n     Disable ccache"
     echo "       -A     Set which branch of arduino-esp32 to be used for compilation"
     echo "       -I     Set which branch of ESP-IDF to be used for compilation"
     echo "       -i     Set which commit of ESP-IDF to be used for compilation"
@@ -40,6 +51,9 @@ while getopts ":A:I:i:c:t:b:D:sde" opt; do
     case ${opt} in
         s )
             SKIP_ENV=1
+            ;;
+        n )
+            CCACHE_ENABLE=0
             ;;
         d )
             DEPLOY_OUT=1
@@ -91,6 +105,8 @@ done
 shift $((OPTIND -1))
 CONFIGS=$@
 
+export IDF_CCACHE_ENABLE=$CCACHE_ENABLE
+
 # Output the TARGET array
 echo "TARGET(s): ${TARGET[@]}"
 
@@ -115,9 +131,6 @@ else
     source ./tools/config.sh
 fi
 
-if [ -f "$AR_MANAGED_COMPS/espressif__esp-sr/.component_hash" ]; then
-    rm -rf $AR_MANAGED_COMPS/espressif__esp-sr/.component_hash
-fi
 
 if [ "$BUILD_TYPE" != "all" ]; then
     if [ "$TARGET" = "all" ]; then
@@ -208,11 +221,6 @@ for target_json in `jq -c '.targets[]' configs/builds.json`; do
     for defconf in `echo "$target_json" | jq -c '.idf_libs[]' | tr -d '"'`; do
         idf_libs_configs="$idf_libs_configs;configs/defconfig.$defconf"
     done
-
-    if [ -f "$AR_MANAGED_COMPS/espressif__esp-sr/.component_hash" ]; then
-        rm -rf $AR_MANAGED_COMPS/espressif__esp-sr/.component_hash
-    fi
-
     echo "* Build IDF-Libs: $idf_libs_configs"
     rm -rf build sdkconfig
     idf.py -DIDF_TARGET="$target" -DSDKCONFIG_DEFAULTS="$idf_libs_configs" idf-libs
@@ -238,10 +246,6 @@ for target_json in `jq -c '.targets[]' configs/builds.json`; do
             bootloader_configs="$bootloader_configs;configs/defconfig.$defconf";
         done
 
-        if [ -f "$AR_MANAGED_COMPS/espressif__esp-sr/.component_hash" ]; then
-            rm -rf $AR_MANAGED_COMPS/espressif__esp-sr/.component_hash
-        fi
-
         echo "* Build BootLoader: $bootloader_configs"
         rm -rf build sdkconfig
         idf.py -DIDF_TARGET="$target" -DSDKCONFIG_DEFAULTS="$bootloader_configs" copy-bootloader
@@ -254,10 +258,6 @@ for target_json in `jq -c '.targets[]' configs/builds.json`; do
         for defconf in `echo "$mem_conf" | jq -c '.[]' | tr -d '"'`; do
             mem_configs="$mem_configs;configs/defconfig.$defconf";
         done
-
-        if [ -f "$AR_MANAGED_COMPS/espressif__esp-sr/.component_hash" ]; then
-            rm -rf $AR_MANAGED_COMPS/espressif__esp-sr/.component_hash
-        fi
 
         echo "* Build Memory Variant: $mem_configs"
         rm -rf build sdkconfig
@@ -299,30 +299,32 @@ done
 
 # update package_esp32_index.template.json
 if [ "$BUILD_TYPE" = "all" ]; then
+    echo "* Generating package_esp32_index.template.json..."
     python3 ./tools/gen_tools_json.py -i "$IDF_PATH" -j "$AR_COMPS/arduino/package/package_esp32_index.template.json" -o "$AR_OUT/"
     python3 ./tools/gen_tools_json.py -i "$IDF_PATH" -o "$TOOLS_JSON_OUT/"
     if [ $? -ne 0 ]; then exit 1; fi
 fi
 
-# Generate PlatformIO manifest file
-if [ "$BUILD_TYPE" = "all" ]; then
-    pushd $IDF_PATH
-    ibr=$(git describe --all 2>/dev/null)
-    ic=$(git -C "$IDF_PATH" rev-parse --short HEAD)
-    popd
-    python3 ./tools/gen_platformio_manifest.py -o "$TOOLS_JSON_OUT/" -s "$ibr" -c "$ic" -n "$GITHUB_RUN_NUMBER"
-    if [ $? -ne 0 ]; then exit 1; fi
-fi
+# Generate pioarduino manifest file
+echo "* Generating pioarduino libs manifest file..."
+pushd $IDF_PATH
+ibr=$(git describe --all 2>/dev/null)
+ic=$(git -C "$IDF_PATH" rev-parse --short HEAD)
+popd
+python3 ./tools/gen_pioarduino_manifest-libs.py -o "$TOOLS_JSON_OUT/" -s "$ibr" -c "$ic" -n "$GITHUB_RUN_NUMBER"
+if [ $? -ne 0 ]; then exit 1; fi
+
+
+
 
 AR_VERSION=$(jq -c '.version' "$AR_COMPS/arduino/package.json" | tr -d '"')
 AR_VERSION_UNDERSCORE=`echo "$AR_VERSION" | tr . _`
 
-# Generate PlatformIO framework manifest file
+# Generate pioarduino framework manifest file
 rm -rf "$AR_ROOT/package.json"
-if [ "$BUILD_TYPE" = "all" ]; then
-    python3 ./tools/gen_pio_frmwk_manifest.py -o "$AR_ROOT/" -s "v$AR_VERSION" -c "$IDF_COMMIT" -n "$GITHUB_RUN_NUMBER"
-    if [ $? -ne 0 ]; then exit 1; fi
-fi
+echo "* Generating pioarduino manifest file..."
+python3 ./tools/gen_pioarduino_manifest.py -o "$AR_ROOT/" -s "v$AR_VERSION" -c "$IDF_COMMIT" -n "$GITHUB_RUN_NUMBER"
+if [ $? -ne 0 ]; then exit 1; fi
 
 # Generate core_version.h
 rm -rf "$AR_ROOT/core_version.h"
@@ -332,20 +334,24 @@ echo "#define ARDUINO_ESP32_GIT_VER 0x$AR_Commit_short
 #define ARDUINO_ESP32_RELEASE \"$AR_VERSION_UNDERSCORE\"" >> "$AR_ROOT/core_version.h"
 
 
+
 # copy everything to arduino-esp32 installation
 if [ $COPY_OUT -eq 1 ] && [ -d "$ESP32_ARDUINO" ]; then
+    echo "* Copying to Arduino..."
     ./tools/copy-to-arduino.sh
     if [ $? -ne 0 ]; then exit 1; fi
 fi
 
 # push changes to esp32-arduino-libs and create pull request into arduino-esp32
 if [ $DEPLOY_OUT -eq 1 ]; then
+    echo "* Pushing to Arduino..."
     ./tools/push-to-arduino.sh
     if [ $? -ne 0 ]; then exit 1; fi
 fi
 
 # archive the build
 if [ $ARCHIVE_OUT -eq 1 ]; then
+    echo "* Archiving build..."
     ./tools/archive-build.sh "$TARGET"
     if [ $? -ne 0 ]; then exit 1; fi
 fi

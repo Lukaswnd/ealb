@@ -1,0 +1,9 @@
+Pull Original and Show Pulled Diff
+Inspect Diffs
+Update AR Branch/Version
+
+Check gihub.com/espressif/arduino-esp32/release//#####VERSION#####/CMakeLists.txt and compare with my-stuff/config/CMakeLists.txt
+
+Rename in workflow
+
+Push to new Branch

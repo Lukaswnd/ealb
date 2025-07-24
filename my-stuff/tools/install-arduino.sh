@@ -5,7 +5,7 @@ source ./tools/config.sh
 #
 # CLONE/UPDATE ARDUINO
 #
-echo "Updating ESP32 Arduino..."
+echo "Updating ESP32 Arduino... from '$AR_REPO_URL'"
 if [ ! -d "$AR_COMPS/arduino" ]; then
 	git clone $AR_REPO_URL "$AR_COMPS/arduino"
 fi
@@ -41,24 +41,12 @@ fi
 
 if [ "$AR_BRANCH" ]; then
 	echo "AR_BRANCH='$AR_BRANCH'"
+	git -C "$AR_COMPS/arduino" fetch --all && \
 	git -C "$AR_COMPS/arduino" checkout "$AR_BRANCH" && \
-	git -C "$AR_COMPS/arduino" fetch && \
 	git -C "$AR_COMPS/arduino" pull --ff-only
 fi
 if [ $? -ne 0 ]; then exit 1; fi
 
-#
-# CLONE/UPDATE ESP32-ARDUINO-LIBS
-#
-if [ ! -d "$IDF_LIBS_DIR" ]; then
-	echo "Cloning esp32-arduino-libs..."
-	git clone "$AR_LIBS_REPO_URL" "$IDF_LIBS_DIR"
-else
-	echo "Updating esp32-arduino-libs..."
-	git -C "$IDF_LIBS_DIR" fetch && \
-	git -C "$IDF_LIBS_DIR" pull --ff-only
-fi
-if [ $? -ne 0 ]; then exit 1; fi
 
 
 # Remove unwanted directories
@@ -68,6 +56,8 @@ rm -rf "$AR_COMPS/arduino/docs" \
        "$AR_COMPS/arduino/libraries/RainMaker" \
        "$AR_COMPS/arduino/libraries/Insights" \
        "$AR_COMPS/arduino/libraries/SPIFFS" \
+	   "$AR_COMPS/arduino//libraries/PPP" \
+	   "$AR_COMPS/arduino//libraries/WiFiProv" \
        "$AR_COMPS/arduino/libraries/ESP_SR" \
        "$AR_COMPS/arduino/libraries/TFLiteMicro"
 

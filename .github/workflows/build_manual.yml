@@ -16,6 +16,7 @@ on:
         - 'esp32c3'
         - 'esp32c6'
         - 'esp32h2'
+        - 'esp32p4'
       log_level:
         type: choice
         description: Choose Log Level
@@ -33,6 +34,9 @@ on:
         type: boolean
         default: true 
 
+permissions:
+  contents: write
+
 jobs:
   run:
     name: Build ${{ github.ref_name }} SDK For ${{ github.event.inputs.target }} as ${{ github.event.inputs.log_level }}
@@ -40,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Apply Changes
         shell: bash
@@ -54,22 +58,21 @@ jobs:
       - name: Build
         shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
           export TARGET_TYPE=${{ github.event.inputs.target }}
           export LOG_LEVEL=${{ github.event.inputs.log_level }}
           echo "Building for $TARGET_TYPE (log_level: $LOG_LEVEL)"
           cd original
-          bash ./build.sh -e -d -t $TARGET_TYPE -D $LOG_LEVEL
+          bash ./build.sh -e -t $TARGET_TYPE -D $LOG_LEVEL
           cd ..
           
       - name: Release
-        uses: jason2866/action-gh-release@v1.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: "ELAB-3.0.x-${{ github.run_number }}"
+          name: "Release ${{ github.run_number }} 3.2.x ${{ github.event.inputs.target }} (log_level: ${{ github.event.inputs.log_level }})"
+          tag_name: "3.2.x.${{ github.run_number }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             ./dist/*
          
