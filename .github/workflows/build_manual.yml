@@ -40,8 +40,11 @@ permissions:
 jobs:
   run:
     name: Build ${{ github.ref_name }} SDK For ${{ github.event.inputs.target }} as ${{ github.event.inputs.log_level }}
-
     runs-on: ubuntu-latest
+
+    env:
+      VERSION_BASE: 3.3.x
+      VERSION_TAG: 3.3.x.${{ github.run_number }}
 
     steps:
       - uses: actions/checkout@v4
@@ -66,22 +69,22 @@ jobs:
           cd original
           bash ./build.sh -e -t $TARGET_TYPE -D $LOG_LEVEL
           cd ..
-          
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Release ${{ github.run_number }} 3.3.x ${{ github.event.inputs.target }} (log_level: ${{ github.event.inputs.log_level }})"
-          tag_name: "3.3.x.${{ github.run_number }}"
+          name: "Release ${{ github.run_number }} ${{ env.VERSION_BASE }} ${{ github.event.inputs.target }} (log_level: ${{ github.event.inputs.log_level }})"
+          tag_name: ${{ env.VERSION_TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             ./dist/*
-         
+
       - name: Determine versions
         id: ver
         run: |
-          TAG=3.3.x.${{ github.run_number }}
-          MAJOR=${TAG%%.*}
-          MINOR=$(echo "$TAG" | cut -d '.' -f2)
+          TAG="${{ env.VERSION_TAG }}"
+          MAJOR="${TAG%%.*}"
+          MINOR="$(echo "$TAG" | cut -d '.' -f2)"
           echo "major=$MAJOR" >> $GITHUB_OUTPUT
           echo "minor=$MINOR" >> $GITHUB_OUTPUT
 
@@ -89,13 +92,11 @@ jobs:
         uses: IsaacShelton/update-existing-release@v1.3.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          release: "{{alias}}"
-          tag: "{{alias}}"
+          release: "Latest"
+          tag: "Latest"
           replace: true
           files: |
             ./dist/*
-        env:
-          alias: Latest
 
       - name: Publish X.Latest release
         uses: IsaacShelton/update-existing-release@v1.3.4
