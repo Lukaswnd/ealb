@@ -76,3 +76,43 @@ jobs:
           files: |
             ./dist/*
          
+      - name: Determine versions
+        id: ver
+        run: |
+          TAG=3.3.x.${{ github.run_number }}
+          MAJOR=${TAG%%.*}
+          MINOR=$(echo "$TAG" | cut -d '.' -f2)
+          echo "major=$MAJOR" >> $GITHUB_OUTPUT
+          echo "minor=$MINOR" >> $GITHUB_OUTPUT
+
+      - name: Publish Latest release aliases
+        uses: IsaacShelton/update-existing-release@v1.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: "{{alias}}"
+          tag: "{{alias}}"
+          replace: true
+          files: |
+            ./dist/*
+        env:
+          alias: Latest
+
+      - name: Publish X.Latest release
+        uses: IsaacShelton/update-existing-release@v1.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: "${{ steps.ver.outputs.major }}.Latest"
+          tag: "${{ steps.ver.outputs.major }}.Latest"
+          replace: true
+          files: |
+            ./dist/*
+
+      - name: Publish X.Y.Latest release
+        uses: IsaacShelton/update-existing-release@v1.3.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: "${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest"
+          tag: "${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest"
+          replace: true
+          files: |
+            ./dist/*
