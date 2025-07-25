@@ -88,32 +88,24 @@ jobs:
           echo "major=$MAJOR" >> $GITHUB_OUTPUT
           echo "minor=$MINOR" >> $GITHUB_OUTPUT
 
-      - name: Publish Latest release aliases
-        uses: IsaacShelton/update-existing-release@v1.3.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release: "Latest"
-          tag: "Latest"
-          replace: true
-          files: |
-            ./dist/*
+      - name: Define release aliases
+        id: aliases
+        run: |
+          echo "aliases=Latest ${{ steps.ver.outputs.major }}.Latest ${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest" >> $GITHUB_OUTPUT
 
-      - name: Publish X.Latest release
-        uses: IsaacShelton/update-existing-release@v1.3.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release: "${{ steps.ver.outputs.major }}.Latest"
-          tag: "${{ steps.ver.outputs.major }}.Latest"
-          replace: true
-          files: |
-            ./dist/*
-
-      - name: Publish X.Y.Latest release
-        uses: IsaacShelton/update-existing-release@v1.3.4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          release: "${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest"
-          tag: "${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest"
-          replace: true
-          files: |
-            ./dist/*
+      - name: Ensure release aliases
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          for tag in ${{ steps.aliases.outputs.aliases }}; do
+            echo "Checking if release with tag '$tag' exists..."
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "✅ Release $tag exists — updating..."
+              gh release upload "$tag" ./dist/* --clobber
+            else
+              echo "➕ Release $tag does not exist — creating..."
+              gh release create "$tag" ./dist/* --title "$tag" --notes "Auto-created alias for $tag"
+            fi
+          done
