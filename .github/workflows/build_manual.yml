@@ -95,7 +95,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Release ${{ github.run_number }} ${{ env.VERSION_BASE }} ${{ github.event.inputs.target }} (log_level: ${{ github.event.inputs.log_level }})"
+          name: "Release ${{ env.RELEASE_TYPE }} ${{ github.run_number }} ${{ env.VERSION_BASE }} ${{ github.event.inputs.target }} (log_level: ${{ github.event.inputs.log_level }})"
           tag_name: ${{ env.VERSION_TAG }}
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
