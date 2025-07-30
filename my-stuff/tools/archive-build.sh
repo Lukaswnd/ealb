@@ -92,9 +92,25 @@ RUN_NUMBER="$2"
 LOG_LEVEL="$3"
 RELEASE_TYPE="$4"
 
-if [[ "$TARGET" == "all" && "$RELEASE_TYPE" == "release" && "$LOG_LEVEL" == "default" ]] ; then
+if [[ "$TARGET" == "all" && "$LOG_LEVEL" == "default" ]]; then
 
-	7z a -mx=9 -tzip -xr'!.*' ../../dist/libs.zip libs/
-	7z a -mx=9 -tzip -xr'!.*' ../../dist/main.zip main/
+	if [[ "$RELEASE_TYPE" == "release"  ]]; then
+		7z a -mx=9 -tzip -xr'!.*' ../../dist/libs.zip libs/
+		7z a -mx=9 -tzip -xr'!.*' ../../dist/main.zip main/
+	else
+		7z a -mx=9 -tzip -xr'!.*' ../../dist/$RELEASE_TYPE-libs.zip libs/
+		7z a -mx=9 -tzip -xr'!.*' ../../dist/$RELEASE_TYPE-main.zip main/
+	fi
+
+elif [[ "$RELEASE_TYPE" == "release" && "$LOG_LEVEL" == "default" ]]; then
+
+	7z a -mx=9 -tzip -xr'!.*' ../../dist/$TARGET-libs.zip libs/
+	7z a -mx=9 -tzip -xr'!.*' ../../dist/$TARGET-main.zip main/
+
+elif [[ "$TARGET" == "all" && "$RELEASE_TYPE" == "release" ]]; then
+
+	7z a -mx=9 -tzip -xr'!.*' ../../dist/$LOG_LEVEL-libs.zip libs/
+	7z a -mx=9 -tzip -xr'!.*' ../../dist/$LOG_LEVEL-main.zip main/
+
 
 fi
