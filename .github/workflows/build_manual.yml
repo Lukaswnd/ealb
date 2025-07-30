@@ -113,11 +113,8 @@ jobs:
       - name: Define release aliases
         id: aliases
         run: |
-          if [[ "${{ env.RELEASE_TYPE }}" == "release" ]]; then
-            echo "aliases=Latest ${{ steps.ver.outputs.major }}.Latest ${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest" >> $GITHUB_OUTPUT
-          else
-            echo "aliases=${{ env.RELEASE_TYPE }}Latest ${{ steps.ver.outputs.major }}.${{ env.RELEASE_TYPE }}.Latest ${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.${{ env.RELEASE_TYPE }}.Latest" >> $GITHUB_OUTPUT
-          fi
+          echo "aliases=Latest ${{ steps.ver.outputs.major }}.Latest ${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest" >> $GITHUB_OUTPUT
+
           
 
       - name: Ensure release aliases
