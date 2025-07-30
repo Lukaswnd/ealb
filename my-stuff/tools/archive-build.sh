@@ -97,4 +97,4 @@ if [[ "$TARGET" == "all" && "$RELEASE_TYPE" == "release" && "$LOG_LEVEL" == "def
 	7z a -mx=9 -tzip -xr'!.*' ../../dist/libs.zip libs/
 	7z a -mx=9 -tzip -xr'!.*' ../../dist/main.zip main/
 
-if
+fi
