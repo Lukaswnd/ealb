@@ -10,6 +10,7 @@ targets:
   - esp32c6
   - esp32h2
   - esp32p4
+  - esp32c5
 tags:
   - arduino
 files:
@@ -21,6 +22,8 @@ files:
     - "variants/esp32c3/**/*"
     - "variants/esp32c6/**/*"
     - "variants/esp32h2/**/*"
+    - "variants/esp32p4/**/*"
+    - "variants/esp32c5/**/*"
   exclude:
     - "docs/"
     - "docs/**/*"
@@ -42,8 +45,8 @@ files:
     - "package.json"
     - "platform.txt"
     - "programmers.txt"
-dependencies:   
-  idf: ">=5.3"
+dependencies:
+  idf: ">=5.3,<5.6"
   # mdns 1.2.1 is necessary to build H2 with no WiFi
   espressif/mdns:
     version: "^1.2.3"
@@ -51,17 +54,27 @@ dependencies:
   espressif/esp_modem:
     version: "^1.1.0"
   espressif/esp-zboss-lib:
-    version: "^1.0.1"
+    version: "==1.6.4" # compatible with esp-zigbee-lib 1.6.5
+    require: public
     rules:
-      - if: "target != esp32c2"
+      - if: "target not in [esp32c2, esp32p4]"
   espressif/esp-zigbee-lib:
-    version: "^1.0.1"
+    version: "==1.6.5"
+    require: public
     rules:
-      - if: "target != esp32c2"
+      - if: "target not in [esp32c2, esp32p4]"
   espressif/esp-dsp:
     version: "^1.3.4"
     rules:
       - if: "target != esp32c2"
+  espressif/esp_hosted:
+    version: "^2.0.12"
+    rules:
+      - if: "target == esp32p4"
+  espressif/esp_wifi_remote:
+    version: "^0.13.0"
+    rules:
+      - if: "target == esp32p4"
   espressif/libsodium:
     version: "^1.0.20~1"
     require: public
@@ -73,10 +86,7 @@ dependencies:
   chmorgan/esp-libhelix-mp3:
     version: "1.0.3"
     require: public
-  espressif/esp_matter:
-    version: "^1.3.0"
-    require: public
-    rules:
-      - if: "target not in [esp32c2, esp32h2, esp32p4]"
 examples:
-  - path: ./idf_component_examples/
+  - path: ./idf_component_examples/hello_world
+  - path: ./idf_component_examples/hw_cdc_hello_world
+  - path: ./idf_component_examples/esp_matter_light

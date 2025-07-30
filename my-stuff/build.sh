@@ -15,6 +15,8 @@ if ! [ -x "$(command -v ninja)" ]; then
     exit 1
 fi
 
+echo "Lukaswnd my information $GITHUB_RUN_NUMBER $LOG_LEVEL $RELEASE_TYPE"
+
 # Fixes building some components. See https://github.com/espressif/arduino-esp32/issues/10167
 export IDF_COMPONENT_OVERWRITE_MANAGED_COMPONENTS=1
 
@@ -131,7 +133,6 @@ else
     source ./tools/config.sh
 fi
 
-
 if [ "$BUILD_TYPE" != "all" ]; then
     if [ "$TARGET" = "all" ]; then
         echo "ERROR: You need to specify target for non-default builds"
@@ -221,23 +222,12 @@ for target_json in `jq -c '.targets[]' configs/builds.json`; do
     for defconf in `echo "$target_json" | jq -c '.idf_libs[]' | tr -d '"'`; do
         idf_libs_configs="$idf_libs_configs;configs/defconfig.$defconf"
     done
+
     echo "* Build IDF-Libs: $idf_libs_configs"
     rm -rf build sdkconfig
     idf.py -DIDF_TARGET="$target" -DSDKCONFIG_DEFAULTS="$idf_libs_configs" idf-libs
     if [ $? -ne 0 ]; then exit 1; fi
 
-    #if [ "$target" == "esp32s3" ]; then
-    #    idf.py -DIDF_TARGET="$target" -DSDKCONFIG_DEFAULTS="$idf_libs_configs" srmodels_bin
-    #    if [ $? -ne 0 ]; then exit 1; fi
-    #    AR_SDK="$AR_TOOLS/esp32-arduino-libs/$target"
-    #    # sr model.bin
-    #    if [ -f "build/srmodels/srmodels.bin" ]; then
-    #        echo "$AR_SDK/esp_sr"
-    #        mkdir -p "$AR_SDK/esp_sr"
-    #        cp -f "build/srmodels/srmodels.bin" "$AR_SDK/esp_sr/"
-    #        cp -f "partitions.csv" "$AR_SDK/esp_sr/"
-    #    fi
-    #fi
 
     # Build Bootloaders
     for boot_conf in `echo "$target_json" | jq -c '.bootloaders[]'`; do
@@ -306,13 +296,17 @@ if [ "$BUILD_TYPE" = "all" ]; then
 fi
 
 # Generate pioarduino manifest file
-echo "* Generating pioarduino libs manifest file..."
-pushd $IDF_PATH
-ibr=$(git describe --all 2>/dev/null)
-ic=$(git -C "$IDF_PATH" rev-parse --short HEAD)
-popd
-python3 ./tools/gen_pioarduino_manifest-libs.py -o "$TOOLS_JSON_OUT/" -s "$ibr" -c "$ic" -n "$GITHUB_RUN_NUMBER"
-if [ $? -ne 0 ]; then exit 1; fi
+if [ "$BUILD_TYPE" = "all" ]; then
+    echo "* Generating pioarduino manifest file..."
+    pushd $IDF_PATH
+    ibr=$(git describe --all 2>/dev/null)
+    ic=$(git -C "$IDF_PATH" rev-parse --short HEAD)
+    popd
+    python3 ./tools/gen_pioarduino_manifest.py -o "$TOOLS_JSON_OUT/" -s "$ibr" -c "$ic" -n "$GITHUB_RUN_NUMBER"
+    if [ $? -ne 0 ]; then exit 1; fi
+fi
+
+
 
 
 
@@ -335,6 +329,8 @@ echo "#define ARDUINO_ESP32_GIT_VER 0x$AR_Commit_short
 
 
 
+
+
 # copy everything to arduino-esp32 installation
 if [ $COPY_OUT -eq 1 ] && [ -d "$ESP32_ARDUINO" ]; then
     echo "* Copying to Arduino..."
@@ -352,6 +348,6 @@ fi
 # archive the build
 if [ $ARCHIVE_OUT -eq 1 ]; then
     echo "* Archiving build..."
-    ./tools/archive-build.sh "$TARGET"
+    ./tools/archive-build.sh "$TARGET" "$GITHUB_RUN_NUMBER" "$LOG_LEVEL" "$RELEASE_TYPE"
     if [ $? -ne 0 ]; then exit 1; fi
 fi
