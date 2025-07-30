@@ -92,7 +92,7 @@ RUN_NUMBER="$2"
 LOG_LEVEL="$3"
 RELEASE_TYPE="$4"
 
-if [[ "$TARGET" == "all" && "$RELEASE_TYPE" == "release" && "$LOG_LEVEL" == "default"]] ; then
+if [[ "$TARGET" == "all" && "$RELEASE_TYPE" == "release" && "$LOG_LEVEL" == "default" ]] ; then
 
 	7z a -mx=9 -tzip -xr'!.*' ../../dist/libs.zip libs/
 	7z a -mx=9 -tzip -xr'!.*' ../../dist/main.zip main/
