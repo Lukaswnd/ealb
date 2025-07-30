@@ -3,6 +3,7 @@ Inspect Diffs
 Update AR Branch/Version
 
 Check gihub.com/espressif/arduino-esp32/release//#####VERSION#####/CMakeLists.txt and compare with my-stuff/config/CMakeLists.txt
+same for the idf_component.yml
 
 Rename in workflow
 
