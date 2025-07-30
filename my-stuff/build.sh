@@ -15,6 +15,8 @@ if ! [ -x "$(command -v ninja)" ]; then
     exit 1
 fi
 
+echo "Lukaswnd my information $GITHUB_RUN_NUMBER $LOG_LEVEL $RELEASE_TYPE"
+
 # Fixes building some components. See https://github.com/espressif/arduino-esp32/issues/10167
 export IDF_COMPONENT_OVERWRITE_MANAGED_COMPONENTS=1
 
@@ -346,6 +348,6 @@ fi
 # archive the build
 if [ $ARCHIVE_OUT -eq 1 ]; then
     echo "* Archiving build..."
-    ./tools/archive-build.sh "$TARGET"
+    ./tools/archive-build.sh "$TARGET" "$GITHUB_RUN_NUMBER" "$LOG_LEVEL" "$RELEASE_TYPE"
     if [ $? -ne 0 ]; then exit 1; fi
 fi

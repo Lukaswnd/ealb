@@ -42,12 +42,33 @@ jobs:
     name: Build ${{ github.ref_name }} SDK For ${{ github.event.inputs.target }} as ${{ github.event.inputs.log_level }}
     runs-on: ubuntu-latest
 
-    env:
-      VERSION_BASE: 3.3.x
-      VERSION_TAG: 3.3.x.${{ github.run_number }}
-
     steps:
       - uses: actions/checkout@v4
+
+      - name: Extract version from branch
+        id: extract_version
+        run: |
+          ref="${GITHUB_REF_NAME}"
+          echo "Current branch: $ref"
+
+          if [[ "$ref" == "main" ]]; then
+            VERSION_BASE="1.0.0"
+            RELEASE_TYPE="main"
+          elif [[ "$ref" =~ ^([^/]+)/([0-9]+\.[0-9]+(\.[0-9]+|\.x)?)$ ]]; then
+            RELEASE_TYPE="${BASH_REMATCH[1]}"
+            VERSION_BASE="${BASH_REMATCH[2]}"
+          else
+            echo "❌ Could not extract version from branch '$ref'"
+            exit 1
+          fi
+
+          VERSION_TAG="${VERSION_BASE}.${GITHUB_RUN_NUMBER}"
+
+          echo "VERSION_BASE=$VERSION_BASE" >> $GITHUB_ENV
+          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
+          echo "RELEASE_TYPE=$RELEASE_TYPE" >> $GITHUB_ENV
+          echo "Extracted RELEASE_TYPE=$RELEASE_TYPE, VERSION_BASE=$VERSION_BASE, VERSION_TAG=$VERSION_TAG"
+
 
       - name: Apply Changes
         shell: bash
@@ -65,7 +86,8 @@ jobs:
         run: |
           export TARGET_TYPE=${{ github.event.inputs.target }}
           export LOG_LEVEL=${{ github.event.inputs.log_level }}
-          echo "Building for $TARGET_TYPE (log_level: $LOG_LEVEL)"
+          export RELEASE_TYPE=${{ env.RELEASE_TYPE }}
+          echo "Building for $TARGET_TYPE (log_level: $LOG_LEVEL) - $RELEASE_TYPE"
           cd original
           bash ./build.sh -e -t $TARGET_TYPE -D $LOG_LEVEL
           cd ..
@@ -91,7 +113,12 @@ jobs:
       - name: Define release aliases
         id: aliases
         run: |
-          echo "aliases=Latest ${{ steps.ver.outputs.major }}.Latest ${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest" >> $GITHUB_OUTPUT
+          if [[ "${{ env.RELEASE_TYPE }}" == "release"]]; then
+            echo "aliases=Latest ${{ steps.ver.outputs.major }}.Latest ${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.Latest" >> $GITHUB_OUTPUT
+          else
+            echo "aliases=${{ env.RELEASE_TYPE }}Latest ${{ steps.ver.outputs.major }}.${{ env.RELEASE_TYPE }}.Latest ${{ steps.ver.outputs.major }}.${{ steps.ver.outputs.minor }}.${{ env.RELEASE_TYPE }}.Latest" >> $GITHUB_OUTPUT
+          fi
+          
 
       - name: Ensure release aliases
         shell: bash
