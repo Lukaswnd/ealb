@@ -2,14 +2,20 @@
 
 source ./tools/config.sh
 
+
+
+TARGET="$1"
+RUN_NUMBER="$2"
+LOG_LEVEL="$3"
+RELEASE_TYPE="$4"
+
 IDF_COMMIT=$(git -C "$IDF_PATH" rev-parse --short HEAD || echo "")
 IDF_BRANCH=$(git -C "$IDF_PATH" symbolic-ref --short HEAD || git -C "$IDF_PATH" tag --points-at HEAD || echo "")
 idf_version_string=${IDF_BRANCH//\//_}"-$IDF_COMMIT"
 
-archive_path="dist/arduino-esp32-libs-$1-$idf_version_string.tar.gz"
-pio_zip_archive_build_path="/build.zip"
-pio_zip_archive_libs_path="/libs.zip"
-pio_zip_archive_path="/main.zip"
+archive_path="dist/arduino-esp32-libs-$TARGET-$idf_version_string.tar.gz"
+pio_zip_archive_libs_path="/$RELEASE_TYPE-$TARGET-$LOG_LEVEL-libs.zip"
+pio_zip_archive_path="/$RELEASE_TYPE-$TARGET-$LOG_LEVEL-main.zip"
 
 mkdir -p dist && rm -rf "$archive_path"
 if [ -d "out" ]; then
@@ -75,12 +81,20 @@ cp -rf tools/esp32-arduino-libs libs/
 cp -rf arduino-esp32/ main/
 
 
-cp -rf tools/esp32-arduino-libs arduino-esp32/tools/
-cp -rf arduino-esp32/ build/
-
 # If the framework is needed as tar.gz uncomment next line
 # tar --exclude=.* -zcf ../$pio_archive_path framework-arduinoespressif32/
 mkdir -p ../../dist
-7z a -mx=9 -tzip -xr'!.*' ../../dist/$pio_zip_archive_build_path build/
 7z a -mx=9 -tzip -xr'!.*' ../../dist/$pio_zip_archive_libs_path libs/
 7z a -mx=9 -tzip -xr'!.*' ../../dist/$pio_zip_archive_path main/
+
+TARGET="$1"
+RUN_NUMBER="$2"
+LOG_LEVEL="$3"
+RELEASE_TYPE="$4"
+
+if [[ "$TARGET" == "all" && "$RELEASE_TYPE" == "release" && "$LOG_LEVEL" == "default"]] ; then
+
+	7z a -mx=9 -tzip -xr'!.*' ../../dist/libs.zip libs/
+	7z a -mx=9 -tzip -xr'!.*' ../../dist/main.zip main/
+
+if
