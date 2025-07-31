@@ -1,0 +1,130 @@
+name: Loop Over Branches and Trigger Workflows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-all:
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    strategy:
+      matrix:
+        target:
+            - log_level: none
+            - log_level: error
+            - log_level: warning
+            - log_level: info
+            - log_level: debug
+            - log_level: verbose
+            - log_level: default
+
+    steps:
+      - name: Trigger workflow
+        run: |
+          ref="${GITHUB_REF_NAME}"
+          echo "Current branch: $ref"
+          gh workflow run build_manual.yml \
+            --ref $ref \
+            --repo $GITHUB_REPOSITORY \
+            -f target=all \
+            -f log_level=${{ matrix.target.log_level }} \
+            -f latest-builder=true
+
+  modify-and-trigger:
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    strategy:
+      matrix:
+        target:
+          - branch: rtti
+            input_target: all
+            log_level: default
+            latest_builder: true
+            replace_old: '# CONFIG_COMPILER_CXX_RTTI is not set'
+            replace_new: 'CONFIG_COMPILER_CXX_RTTI=y'
+          - branch: exceptions
+            input_target: all
+            log_level: default
+            latest_builder: true
+            replace_old: '# CONFIG_COMPILER_CXX_EXCEPTIONS is not set'
+            replace_new: 'CONFIG_COMPILER_CXX_EXCEPTIONS=y'
+          - branch: rtti-exceptions
+            input_target: all
+            log_level: default
+            latest_builder: true
+            replace_old: '# CONFIG_COMPILER_CXX_EXCEPTIONS is not set,# CONFIG_COMPILER_CXX_RTTI is not set'
+            replace_new: 'CONFIG_COMPILER_CXX_EXCEPTIONS=y,CONFIG_COMPILER_CXX_RTTI=y'
+          - branch: performance
+            input_target: all
+            log_level: default
+            latest_builder: true
+            replace_old: 'CONFIG_COMPILER_OPTIMIZATION_SIZE=y,# CONFIG_COMPILER_OPTIMIZATION_PERF is not set'
+            replace_new: '# CONFIG_COMPILER_OPTIMIZATION_SIZE is not set,CONFIG_COMPILER_OPTIMIZATION_PERF=y'
+    
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ env.GH_TOKEN }}
+      
+      - name: Extract suffix from current branch
+        id: branch_parts
+        run: |
+          full="${GITHUB_REF_NAME}"
+          suffix="${full#*/}" # removes everything up to and including the first '/'
+          echo "suffix=$suffix" >> $GITHUB_OUTPUT
+
+      - name: Compose full target branch name
+        id: full_branch
+        run: |
+          echo "full_branch=${{ matrix.target.branch }}/${{ steps.branch_parts.outputs.suffix }}" >> $GITHUB_OUTPUT         
+
+          
+      - name: Replace lines in defconfig
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git checkout -B ${{ steps.full_branch.outputs.full_branch }}
+          echo "// Auto-generated on $(date)" > generated_file.txt
+          git add generated_file.txt
+          
+          # Create arrays from matrix values
+          IFS=',' read -ra old <<< "${{ matrix.target.replace_old }}"
+          IFS=',' read -ra new <<< "${{ matrix.target.replace_new }}"
+      
+          config_file="my_stuff/configs/defconfig.common"
+      
+          for i in "${!old[@]}"; do
+            from="${old[$i]}"
+            to="${new[$i]}"
+            
+            # Escape slashes for sed safety
+            from_escaped=$(printf '%s\n' "$from" | sed 's/[&/\]/\\&/g')
+            to_escaped=$(printf '%s\n' "$to" | sed 's/[&/\]/\\&/g')
+      
+            echo "Replacing: '$from' → '$to'"
+            
+            # In-place replacement
+            sed -i "s|$from_escaped|$to_escaped|" "$config_file"
+          done
+
+          git add "$config_file"
+          git commit -m "Automated commit to ${{ steps.full_branch.outputs.full_branch }}" || echo "Nothing to commit"
+          git push origin ${{ steps.full_branch.outputs.full_branch }} --force
+
+          
+      - name: Trigger workflow on new branch
+        run: |
+          gh workflow run build_manual.yml \
+            --ref ${{ steps.full_branch.outputs.full_branch }} \
+            --repo $GITHUB_REPOSITORY \
+            -f target=${{ matrix.target.input_target }} \
+            -f log_level=${{ matrix.target.log_level }} \
+            -f latest-builder=${{ matrix.target.latest_builder }}          
