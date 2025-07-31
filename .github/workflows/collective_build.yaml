@@ -99,7 +99,7 @@ jobs:
           IFS=',' read -ra old <<< "${{ matrix.target.replace_old }}"
           IFS=',' read -ra new <<< "${{ matrix.target.replace_new }}"
       
-          config_file="my_stuff/configs/defconfig.common"
+          config_file="my-stuff/configs/defconfig.common"
       
           for i in "${!old[@]}"; do
             from="${old[$i]}"
