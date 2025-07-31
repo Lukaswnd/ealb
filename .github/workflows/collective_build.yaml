@@ -1,4 +1,4 @@
-name: Loop Over Branches and Trigger Workflows
+name: Build a lot
 
 on:
   workflow_dispatch:
