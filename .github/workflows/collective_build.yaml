@@ -66,10 +66,22 @@ jobs:
             latest_builder: true
             replace_old: 'CONFIG_COMPILER_OPTIMIZATION_SIZE=y,# CONFIG_COMPILER_OPTIMIZATION_PERF is not set'
             replace_new: '# CONFIG_COMPILER_OPTIMIZATION_SIZE is not set,CONFIG_COMPILER_OPTIMIZATION_PERF=y'
+          - branch: performance-exceptions
+            input_target: all
+            log_level: default
+            latest_builder: true
+            replace_old: 'CONFIG_COMPILER_OPTIMIZATION_SIZE=y,# CONFIG_COMPILER_OPTIMIZATION_PERF is not set,# CONFIG_COMPILER_CXX_EXCEPTIONS is not set'
+            replace_new: '# CONFIG_COMPILER_OPTIMIZATION_SIZE is not set,CONFIG_COMPILER_OPTIMIZATION_PERF=y,CONFIG_COMPILER_CXX_EXCEPTIONS=y'
+          - branch: performance-rtti-exceptions
+            input_target: all
+            log_level: default
+            latest_builder: true
+            replace_old: 'CONFIG_COMPILER_OPTIMIZATION_SIZE=y,# CONFIG_COMPILER_OPTIMIZATION_PERF is not set,# CONFIG_COMPILER_CXX_EXCEPTIONS is not set,# CONFIG_COMPILER_CXX_RTTI is not set'
+            replace_new: '# CONFIG_COMPILER_OPTIMIZATION_SIZE is not set,CONFIG_COMPILER_OPTIMIZATION_PERF=y,CONFIG_COMPILER_CXX_EXCEPTIONS=y,CONFIG_COMPILER_CXX_RTTI=y'
     
     steps:
       - name: Checkout current branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           token: ${{ env.GH_TOKEN }}
@@ -99,7 +111,7 @@ jobs:
           IFS=',' read -ra old <<< "${{ matrix.target.replace_old }}"
           IFS=',' read -ra new <<< "${{ matrix.target.replace_new }}"
       
-          config_file="my_stuff/configs/defconfig.common"
+          config_file="my-stuff/configs/defconfig.common"
       
           for i in "${!old[@]}"; do
             from="${old[$i]}"
