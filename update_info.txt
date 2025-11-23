@@ -1,6 +1,6 @@
 Pull Original and Show Pulled Diff
 Inspect Diffs
-Update AR Branch/Version
+Update AR Branch/Version (in tools/config.sh?)
 
 Check gihub.com/espressif/arduino-esp32/release//#####VERSION#####/CMakeLists.txt and compare with my-stuff/config/CMakeLists.txt
 same for the idf_component.yml
