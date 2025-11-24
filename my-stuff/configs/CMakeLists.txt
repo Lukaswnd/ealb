@@ -351,9 +351,9 @@ set(priv_requires fatfs nvs_flash app_update spiffs bootloader_support bt esp_hi
 if(NOT CONFIG_ARDUINO_SELECTIVE_COMPILATION OR CONFIG_ARDUINO_SELECTIVE_OpenThread)
   #if(CONFIG_SOC_IEEE802154_SUPPORTED) # Does not work!
   #if(CONFIG_OPENTHREAD_ENABLED) # Does not work!
-  if(IDF_TARGET STREQUAL "esp32c6" OR IDF_TARGET STREQUAL "esp32h2" OR IDF_TARGET STREQUAL "esp32c5") # Sadly only this works
-    list(APPEND requires openthread)
-  endif()
+  #if(IDF_TARGET STREQUAL "esp32c6" OR IDF_TARGET STREQUAL "esp32h2" OR IDF_TARGET STREQUAL "esp32c5") # Sadly only this works
+  list(APPEND requires openthread)
+  #endif()
 endif()
 
 if(IDF_TARGET STREQUAL "esp32" OR IDF_TARGET STREQUAL "esp32s2" OR IDF_TARGET STREQUAL "esp32s3" OR IDF_TARGET STREQUAL "esp32p4")
