@@ -14,7 +14,12 @@ CONFIG_ESP_WIFI_MBO_SUPPORT=y
 CONFIG_ESP_WIFI_11R_SUPPORT=y
 CONFIG_FREERTOS_TIMER_TASK_STACK_DEPTH=4096
 
-# Matter settings:
+# Matter settings: WiFi and OpenThread + CHIPoBLE
+CONFIG_ENABLE_CHIPOBLE=y
+# Set endpoint id for Thread and Wi-Fi, depending on the secondary network interface endpoint id.
+CONFIG_WIFI_NETWORK_ENDPOINT_ID=0
+# increase the maximum number of endpoints per device
+CONFIG_ESP_MATTER_MAX_DYNAMIC_ENDPOINT_COUNT=25
 
 
 
