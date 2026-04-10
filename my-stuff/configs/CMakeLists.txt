@@ -118,7 +118,6 @@ set(ARDUINO_ALL_LIBRARIES
   WebServer
   NetworkClientSecure
   WiFi
-  WiFiProv
   Wire
   Zigbee
   )
@@ -278,8 +277,6 @@ set(ARDUINO_LIBRARY_WiFi_SRCS
   libraries/WiFi/src/WiFiSTA.cpp
   libraries/WiFi/src/STA.cpp
   libraries/WiFi/src/AP.cpp)
-
-set(ARDUINO_LIBRARY_WiFiProv_SRCS libraries/WiFiProv/src/WiFiProv.cpp)
 
 set(ARDUINO_LIBRARY_Wire_SRCS libraries/Wire/src/Wire.cpp)
 
