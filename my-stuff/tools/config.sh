@@ -89,6 +89,7 @@ get_os() {
 AR_OS=$(get_os)
 export SED="sed"
 export SSTAT="stat -c %s"
+export REALPATH="realpath"
 
 if [[ "$AR_OS" == "macos" ]]; then
     if ! command -v gsed >/dev/null; then
@@ -99,8 +100,13 @@ if [[ "$AR_OS" == "macos" ]]; then
         echo "ERROR: gawk not installed" >&2
         exit 1
     fi
+    if ! command -v grealpath >/dev/null; then
+        echo "ERROR: grealpath not installed (try: brew install coreutils)" >&2
+        exit 1
+    fi
     export SED="gsed"
     export SSTAT="stat -f %z"
+    export REALPATH="grealpath"
 fi
 
 github_get_libs_idf() {
@@ -253,6 +259,37 @@ git_commit_exists() {
     DEBUG "git_commit_exists($1, $2)"
     local repo_path="$1" commit_message="$2"
     git -C "$repo_path" log --all --grep="$commit_message" | grep -q commit && echo 1 || echo 0
+}
+
+set_ar_source_branch() {
+    DEBUG "set_ar_source_branch($1, $2, $3)"
+    local branch_exists_fn="$1"
+    local repo="$2"
+    local idf_ref="$3"
+
+    if [ -n "$AR_SOURCE_BRANCH" ]; then
+        export AR_SOURCE_BRANCH
+        return
+    fi
+
+    local current_branch
+    if [ -z "$GITHUB_HEAD_REF" ]; then
+        current_branch=$(git branch --show-current)
+    else
+        current_branch="$GITHUB_HEAD_REF"
+    fi
+
+    local candidate="idf-$idf_ref"
+    if [[ "$current_branch" != "master" && $($branch_exists_fn "$repo" "$current_branch") == "1" ]]; then
+        AR_SOURCE_BRANCH="$current_branch"
+    elif [ "$($branch_exists_fn "$repo" "$candidate")" == "1" ]; then
+        AR_SOURCE_BRANCH="$candidate"
+    elif [ "$($branch_exists_fn "$repo" "$AR_PR_TARGET_BRANCH")" == "1" ]; then
+        AR_SOURCE_BRANCH="$AR_PR_TARGET_BRANCH"
+    else
+        AR_SOURCE_BRANCH="master"
+    fi
+    export AR_SOURCE_BRANCH
 }
 
 git_create_pr() {
