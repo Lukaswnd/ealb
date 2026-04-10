@@ -5,8 +5,8 @@ Update AR Branch/Version (in tools/config.sh?)
 Check gihub.com/espressif/arduino-esp32/release//#####VERSION#####/CMakeLists.txt and compare with my-stuff/config/CMakeLists.txt
 same for the idf_component.yml
 
-Rename in workflow
+Rename in workflow - is this still needed?
 
 Push to new Branch
 
-// CONFIG_ESPNOW_ENABLE_LONG_RANGE
+// CONFIG_ESPNOW_ENABLE_LONG_RANGE   - no results on https://docs.espressif.com/projects/esp-idf/en/v5.5.4/esp32c3/api-reference/kconfig-reference.html
