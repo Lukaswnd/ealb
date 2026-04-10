@@ -8,3 +8,5 @@ same for the idf_component.yml
 Rename in workflow
 
 Push to new Branch
+
+// CONFIG_ESPNOW_ENABLE_LONG_RANGE
