@@ -38,14 +38,14 @@ OUTPUT_DIR="$AR_TOOLS/esp32-arduino-libs/hosted"
 mkdir -p "$OUTPUT_DIR"
 
 TARGETS=(
-    #"esp32"
-    #"esp32c2"
-    #"esp32c3"
-    #"esp32c5"
+    "esp32"
+    "esp32c2"
+    "esp32c3"
+    "esp32c5"
     "esp32c6"
-    #"esp32c61"
-    #"esp32s2"
-    #"esp32s3"
+    "esp32c61"
+    "esp32s2"
+    "esp32s3"
 )
 
 for target in "${TARGETS[@]}"; do
@@ -55,9 +55,4 @@ for target in "${TARGETS[@]}"; do
     idf.py build
     cp "$SLAVE_DIR/build/network_adapter.bin" "$OUTPUT_DIR/$target-v$VERSION.bin"
     echo "Build completed: $target-v$VERSION.bin"
-done
-
-echo "files in $OUTPUT_DIR"
-for entry in "$OUTPUT_DIR"/*; do
-  echo "$entry"
 done
