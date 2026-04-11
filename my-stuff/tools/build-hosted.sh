@@ -38,14 +38,14 @@ OUTPUT_DIR="$AR_TOOLS/esp32-arduino-libs/hosted"
 mkdir -p "$OUTPUT_DIR"
 
 TARGETS=(
-    "esp32"
-    "esp32c2"
-    "esp32c3"
-    "esp32c5"
+    #"esp32"
+    #"esp32c2"
+    #"esp32c3"
+    #"esp32c5"
     "esp32c6"
-    "esp32c61"
-    "esp32s2"
-    "esp32s3"
+    #"esp32c61"
+    #"esp32s2"
+    #"esp32s3"
 )
 
 for target in "${TARGETS[@]}"; do

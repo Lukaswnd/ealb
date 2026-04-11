@@ -23,12 +23,12 @@ if [ -d "out" ]; then
 fi
 
 echo "files in arduino-esp32/tools/esp32-arduino-libs/"
-for entry in arduino-esp32/tools/esp32-arduino-libs/*; do
+for entry in "arduino-esp32/tools/esp32-arduino-libs"/*; do
   echo "$entry"
 done
 
 echo "files in tools/esp32-arduino-libs/"
-for entry in tools/esp32-arduino-libs/*; do
+for entry in "tools/esp32-arduino-libs"/*; do
   echo "$entry"
 done
 
