@@ -22,6 +22,16 @@ if [ -d "out" ]; then
 	cd out && tar zcf "../$archive_path" * && cd ..
 fi
 
+echo "files in arduino-esp32/tools/esp32-arduino-libs/"
+for entry in arduino-esp32/tools/esp32-arduino-libs/*; do
+  echo "$entry"
+done
+
+echo "files in tools/esp32-arduino-libs/"
+for entry in tools/esp32-arduino-libs/*; do
+  echo "$entry"
+done
+
 cd out 
 echo "Creating PioArduino framework-arduinoespressif32"
 mkdir -p arduino-esp32/cores/esp32
