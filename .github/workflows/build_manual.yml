@@ -20,6 +20,7 @@ on:
         - 'esp32h2'
         - 'esp32p4'
         - 'esp32p4_es'
+        - 'esp32p4_c5_es'
       log_level:
         type: choice
         description: Choose Log Level
