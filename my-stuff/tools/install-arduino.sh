@@ -41,10 +41,7 @@ rm -rf "$AR_COMPS/arduino/docs" \
 	   "$AR_COMPS/arduino//libraries/WiFiProv" \
        "$AR_COMPS/arduino/libraries/ESP_SR" \
        "$AR_COMPS/arduino/libraries/TFLiteMicro"\
-	   "$AR_COMPS/arduino/libraries/ESP_Video" \
-	   "$AR_COMPS/arduino/libraries/Matter/src/matter_closure_patch.h"
-
-touch "$AR_COMPS/arduino/libraries/Matter/src/matter_closure_patch.h"
+	   "$AR_COMPS/arduino/libraries/ESP_Video" 
 
 if [ $? -ne 0 ]; then
     echo "Error removing directories"
