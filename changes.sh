@@ -5,8 +5,8 @@ update_submodule() {
     if [ "$GITHUB_UPDATE_BUILDER" = "true" ]; then
         echo "Updating submodule..."
         cd original
-        git checkout main # Or the branch you want to track
-        git pull origin main
+        git checkout master # Or the branch you want to track
+        git pull origin master
         cd ..
     else
         echo "Skipping submodule update..."

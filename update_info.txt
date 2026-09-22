@@ -10,3 +10,36 @@ Rename in workflow - is this still needed?
 Push to new Branch
 
 // CONFIG_ESPNOW_ENABLE_LONG_RANGE   - no results on https://docs.espressif.com/projects/esp-idf/en/v5.5.4/esp32c3/api-reference/kconfig-reference.html
+
+maybe test:
+#start docker desktop
+
+#open WSL
+wsl
+
+#maksure the files don't have '\r'
+git checkout -- .
+
+act workflow_dispatch \
+  -W .github/workflows/build_manual.yml \
+  --input target=esp32p4 \
+  --input log_level=default \
+  --input latest-builder=true \
+  -P ubuntu-latest=catthehacker/ubuntu:act-22.04
+  
+  -P ubuntu-latest=catthehacker/ubuntu:act-latest
+  
+  
+  
+#if not working replace original/tools/prepare-ci.sh with:
+#!/bin/bash
+
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository -y universe
+sudo apt update
+
+sudo apt install -y git wget curl libssl-dev libncurses-dev flex bison gperf python3 cmake ninja-build ccache
+
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py && \
+pip3 install setuptools pyserial click future wheel cryptography pyparsing pyelftools
