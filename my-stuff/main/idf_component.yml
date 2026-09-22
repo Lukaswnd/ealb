@@ -17,10 +17,14 @@ dependencies:
     require: public
 
   espressif/esp_matter:
-    version: "1.5" 
+    version: "^1.6.1" 
     require: public
     rules:
       - if: "target not in [esp32c2, esp32p4, esp32c61]"
+  #espressif/esp-serial-flasher:
+  #  rules:
+  #  - if: idf_version >=5.0
+  #  version: ~2.0.0
 #  Turn off for now, because it increases firmware size considerably
 #  espressif/esp_video:
 #    version: ">=2.2.0"
