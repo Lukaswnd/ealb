@@ -22,10 +22,11 @@ git checkout -- .
 
 act workflow_dispatch \
   -W .github/workflows/build_manual.yml \
-  --input target=esp32p4 \
+  --input target=esp32 \
   --input log_level=default \
   --input latest-builder=true \
-  -P ubuntu-latest=catthehacker/ubuntu:act-22.04
+  -P ubuntu-latest=ealb-runner:latest
+  --pull=false
   
   -P ubuntu-latest=catthehacker/ubuntu:act-latest
   
