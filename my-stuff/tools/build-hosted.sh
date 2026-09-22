@@ -12,6 +12,11 @@ if [ ! -d "$SLAVE_DIR" ]; then
 	exit 1
 fi
 
+EXTRA_CFG="$SLAVE_DIR/sdkconfig.defaults.extra"
+cat > "$EXTRA_CFG" <<'EOF'
+CONFIG_ESP_HOSTED_CP_FEAT_GPIO_EXP=y
+EOF
+
 VERSION_FILE="$SLAVE_DIR/main/esp_hosted_coprocessor_fw_ver.h"
 
 if [ ! -f "$VERSION_FILE" ]; then
@@ -50,6 +55,12 @@ TARGETS=(
 
 for target in "${TARGETS[@]}"; do
     echo "Building for target: $target"
+    
+    DEFAULTS="sdkconfig.defaults"
+    [ -f "sdkconfig.defaults.$target" ] && DEFAULTS="$DEFAULTS;sdkconfig.defaults.$target"
+    export SDKCONFIG_DEFAULTS="$DEFAULTS;$EXTRA_CFG"
+
+    rm -f sdkconfig   
     idf.py set-target "$target"
     idf.py clean
     idf.py build
