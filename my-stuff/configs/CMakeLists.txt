@@ -108,7 +108,6 @@ set(ARDUINO_ALL_LIBRARIES
   HTTPUpdate
   HTTPUpdateServer
   LittleFS
-  Matter
   NetBIOS
   Network
   OpenThread
@@ -190,36 +189,6 @@ set(ARDUINO_LIBRARY_OpenThread_SRCS
   libraries/OpenThread/src/OThreadCLI_Util.cpp
   libraries/OpenThread/src/OThreadScan.cpp
   libraries/OpenThread/src/OThreadDNSSD.cpp)
-
-set(ARDUINO_LIBRARY_Matter_SRCS
-  libraries/Matter/src/MatterEndpoints/MatterGenericSwitch.cpp
-  libraries/Matter/src/MatterEndpoints/MatterOnOffLight.cpp
-  libraries/Matter/src/MatterEndpoints/MatterDimmableLight.cpp
-  libraries/Matter/src/MatterEndpoints/MatterColorTemperatureLight.cpp
-  libraries/Matter/src/MatterEndpoints/MatterColorLight.cpp
-  libraries/Matter/src/MatterEndpoints/MatterEnhancedColorLight.cpp
-  libraries/Matter/src/MatterEndpoints/MatterFan.cpp
-  libraries/Matter/src/MatterEndpoints/MatterTemperatureSensor.cpp
-  libraries/Matter/src/MatterEndpoints/MatterTemperatureControlledCabinet.cpp
-  libraries/Matter/src/MatterEndpoints/MatterHumiditySensor.cpp
-  libraries/Matter/src/MatterEndpoints/MatterContactSensor.cpp
-  libraries/Matter/src/MatterEndpoints/MatterWaterLeakDetector.cpp
-  libraries/Matter/src/MatterEndpoints/MatterWaterFreezeDetector.cpp
-  libraries/Matter/src/MatterEndpoints/MatterRainSensor.cpp
-  libraries/Matter/src/MatterEndpoints/MatterPressureSensor.cpp
-  libraries/Matter/src/MatterEndpoints/MatterOccupancySensor.cpp
-  libraries/Matter/src/MatterEndpoints/MatterOnOffPlugin.cpp
-  libraries/Matter/src/MatterEndpoints/MatterDimmablePlugin.cpp
-  libraries/Matter/src/MatterEndpoints/MatterThermostat.cpp
-  libraries/Matter/src/MatterEndpoints/MatterWindowCovering.cpp
-  libraries/Matter/src/MatterEndpoints/MatterLightSensor.cpp
-  libraries/Matter/src/Matter.cpp
-  libraries/Matter/src/MatterHelpers.cpp
-  libraries/Matter/src/MatterButton.cpp
-  libraries/Matter/src/MatterIdentity.cpp
-  libraries/Matter/src/MatterEndPoint.cpp
-  libraries/Matter/src/MatterWiFiStackWrap.cpp
-  libraries/Matter/src/MatterMemWrap.cpp)
 
 set(ARDUINO_LIBRARY_Preferences_SRCS libraries/Preferences/src/Preferences.cpp)
 
@@ -462,25 +431,6 @@ if(CONFIG_OPENTHREAD_ENABLED AND CONFIG_SOC_IEEE802154_SUPPORTED)
     "-u __wrap_otPlatMessagePoolDeinit")
 endif()
 
-# Matter: skip CHIP InitWiFiStack when Thread or Ethernet is selected.
-# --wrap of a missing symbol is ignored (H2 has no Wi-Fi stack).
-if(CONFIG_ESP_MATTER_ENABLE_DATA_MODEL AND CONFIG_ENABLE_WIFI_STATION)
-  idf_build_set_property(LINK_OPTIONS "-Wl,--wrap=_ZN4chip11DeviceLayer8Internal10ESP32Utils13InitWiFiStackEv" APPEND)
-  target_link_libraries(${COMPONENT_LIB} INTERFACE "-u __wrap__ZN4chip11DeviceLayer8Internal10ESP32Utils13InitWiFiStackEv")
-endif()
-
-# Matter data model: prefer SPIRAM when that heap exists (bypass malloc 4096 rule).
-# C++ mangled names from harvested libespressif__esp_matter.a (nm-confirmed).
-if(CONFIG_ESP_MATTER_ENABLE_DATA_MODEL)
-  idf_build_set_property(LINK_OPTIONS "-Wl,--wrap=_Z21esp_matter_mem_callocjj" APPEND)
-  idf_build_set_property(LINK_OPTIONS "-Wl,--wrap=_Z22esp_matter_mem_reallocPvj" APPEND)
-  idf_build_set_property(LINK_OPTIONS "-Wl,--wrap=_Z19esp_matter_mem_freePv" APPEND)
-  target_link_libraries(${COMPONENT_LIB} INTERFACE
-    "-u __wrap__Z21esp_matter_mem_callocjj"
-    "-u __wrap__Z22esp_matter_mem_reallocPvj"
-    "-u __wrap__Z19esp_matter_mem_freePv")
-endif()
-
 # This function adds a dependency on the given component if the component is included into the build.
 function(maybe_add_component component_name)
     idf_build_get_property(components BUILD_COMPONENTS)
@@ -498,10 +448,6 @@ if(NOT CONFIG_ARDUINO_SELECTIVE_COMPILATION OR CONFIG_ARDUINO_SELECTIVE_ArduinoO
 endif()
 if(NOT CONFIG_ARDUINO_SELECTIVE_COMPILATION OR CONFIG_ARDUINO_SELECTIVE_ESP_SR)
     maybe_add_component(espressif__esp_sr)
-endif()
-if(NOT CONFIG_ARDUINO_SELECTIVE_COMPILATION OR CONFIG_ARDUINO_SELECTIVE_Matter)
-    maybe_add_component(espressif__esp_matter)
-
 endif()
 if(NOT CONFIG_ARDUINO_SELECTIVE_COMPILATION OR CONFIG_ARDUINO_SELECTIVE_LittleFS)
     maybe_add_component(joltwallet__littlefs)

@@ -264,9 +264,9 @@ if [ "$BUILD_TYPE" != "all" ]; then
         idf.py -DIDF_TARGET="$target" -DSDKCONFIG_DEFAULTS="$configs" $BUILD_TYPE
         if [ $? -ne 0 ]; then exit 1; fi
 
-        if [ "$BUILD_TYPE" == "idf-libs" ]; then
-            harvest_matter_libs "$target_json" "$target" "$configs"
-        fi
+        #if [ "$BUILD_TYPE" == "idf-libs" ]; then
+        #    harvest_matter_libs "$target_json" "$target" "$configs"
+        #fi
 
         if [ "$BUILD_TYPE" == "srmodels_bin" ]; then
             AR_SDK="$AR_TOOLS/esp32-arduino-libs/$CHIP_VARIANT"
@@ -335,7 +335,7 @@ for target_json in `jq -c '.targets[]' configs/builds.json`; do
     idf.py -DIDF_TARGET="$target" -DSDKCONFIG_DEFAULTS="$idf_libs_configs" idf-libs
     if [ $? -ne 0 ]; then exit 1; fi
 
-    harvest_matter_libs "$target_json" "$target" "$idf_libs_configs"
+    #harvest_matter_libs "$target_json" "$target" "$idf_libs_configs"
 
     # Build ESP-Hosted slave firmwares
     if [ "$CHIP_VARIANT" == "esp32p4" ]; then

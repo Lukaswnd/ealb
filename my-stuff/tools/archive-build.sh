@@ -45,6 +45,7 @@ rm -rf arduino-esp32/libraries/WiFiProv
 rm -rf arduino-esp32/libraries/TFLiteMicro
 rm -rf arduino-esp32/libraries/ESP_SR
 rm -rf arduino-esp32/libraries/ESP_Video
+rm -rf arduino-esp32/libraries/Matter
 rm -rf arduino-esp32/tools/esp32-arduino-libs
 rm -rf arduino-esp32/tools/gen_insights_package.py
 #rm -rf arduino-esp32/package.json
